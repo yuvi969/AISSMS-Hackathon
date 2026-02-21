@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import L from "leaflet"
-import { MapPin} from "lucide-react"
+import { MapPin } from "lucide-react"
 
 // Fix broken marker icons in Vite/Webpack
 delete L.Icon.Default.prototype._getIconUrl
@@ -96,7 +96,7 @@ export default function Leaflet() {
 
   return (
     <>
-      
+
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
@@ -168,9 +168,9 @@ export default function Leaflet() {
 
           <button
             onClick={handleLocate}
-            className="px-4 py-2.5 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-200 transition-all whitespace-nowrap"
+            className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-200 transition-all whitespace-nowrap"
           >
-            <MapPin /> Locate Me
+            <MapPin size={14} /> Locate Me
           </button>
         </div>
 

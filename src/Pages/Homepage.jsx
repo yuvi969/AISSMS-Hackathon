@@ -4,10 +4,10 @@ import Leaflet from "../Components/Leaflet"
 import EnvIcon from "../Components/Evicon"
 
 const stats = [
-  { value: "2.4M", label: "Active Users",     icon: "◈", color: "#1C7DF1" },
-  { value: "847",  label: "Cities Monitored", icon: "⬡", color: "#17ce3c" },
-  { value: "12K",  label: "Rewards Earned",   icon: "◆", color: "#ed8a26" },
-  { value: "98%",  label: "Data Accuracy",    icon: "▲", color: "#a855f7" },
+  { value: "2.4", label: "Active Users",     icon: "◈", color: "#1C7DF1" },
+  { value: "47",  label: "Cities Monitored", icon: "⬡", color: "#17ce3c" },
+  { value: "12",  label: "Rewards Earned",   icon: "◆", color: "#ed8a26" },
+  { value: "89%",  label: "Data Accuracy",    icon: "▲", color: "#a855f7" },
 ]
 
 export default function Homepage() {

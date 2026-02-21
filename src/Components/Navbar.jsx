@@ -1,4 +1,4 @@
-import { User } from 'lucide-react'
+import { BookCheck, User } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 
@@ -74,11 +74,11 @@ const Navbar = () => {
                     </div>
 
                     <button
-                        onClick={() => navigate('/profile')}
+                        onClick={() => navigate('/form')}
                         className="hidden md:flex items-center px-6 py-3 mr-2 bg-[#1C7DF1] text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
                     >
-                        <User className="inline mr-2" size={16} />
-                        Profile
+                        <BookCheck className="inline mr-2" size={16} />
+                        Form
                     </button>
 
                     {/* Mobile Hamburger */}
@@ -112,11 +112,11 @@ const Navbar = () => {
                             </button>
                         ))}
                         <button
-                            onClick={() => navigate('/profile')}
+                            onClick={() => navigate('/form')}
                             className="flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300"
                         >
-                            <User className="inline mr-2" size={16} />
-                            Profile
+                            <BookCheck className="inline mr-2" size={16} />
+                            Form
                         </button>
                     </div>
                 </div>
