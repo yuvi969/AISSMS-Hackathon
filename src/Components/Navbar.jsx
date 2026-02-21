@@ -1,4 +1,4 @@
-import { User } from 'lucide-react'
+import { Bell, User } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 
@@ -17,9 +17,10 @@ const Navbar = () => {
     }, [])
 
     const navItems = [
-        { name: 'Home',        path: '/' },
-        { name: 'Dashboard',   path: '/dashboard' },
+        { name: 'Home',        path: '/'            },
+        { name: 'Dashboard',   path: '/dashboard'   },
         { name: 'Leaderboard', path: '/leaderboard' },
+        { name: 'EcoSnap',     path: '/form'        },
     ]
 
     const handleNavClick = (path) => {
@@ -27,11 +28,10 @@ const Navbar = () => {
         setIsMobileMenuOpen(false)
     }
 
-    // Active = current route matches the item path
     const isActive = (path) => location.pathname === path
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 py-6">
+        <nav className="absolute top-0 left-0 right-0 z-50 py-6">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex items-center justify-between">
 
@@ -45,7 +45,7 @@ const Navbar = () => {
                         </span>
                     </button>
 
-                    {/* Desktop Nav */}
+                    {/* Desktop Nav Links */}
                     <div className={`hidden md:flex items-center space-x-1 px-6 py-3 rounded-full transition-all duration-300 ${
                         isScrolled
                             ? 'bg-[#7d7b7bb1] backdrop-blur-md shadow-lg border border-white/10'
@@ -62,24 +62,33 @@ const Navbar = () => {
                                 }`}
                             >
                                 {item.name}
-                                <span
-                                    className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-purple-200 transform origin-left transition-transform duration-300 ${
-                                        isActive(item.path)
-                                            ? 'scale-x-100'
-                                            : 'scale-x-0 group-hover:scale-x-100'
-                                    }`}
-                                />
+                                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-purple-200 transform origin-left transition-transform duration-300 ${
+                                    isActive(item.path) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                                }`} />
                             </button>
                         ))}
                     </div>
 
-                    <button
-                        onClick={() => navigate('/profile')}
-                        className="hidden md:flex items-center px-6 py-3 mr-2 bg-[#1C7DF1] text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
-                    >
-                        <User className="inline mr-2" size={16} />
-                        Profile
-                    </button>
+                    {/* Desktop Right Actions */}
+                    <div className="hidden md:flex items-center gap-3">
+                        {/* Bell */}
+                        <button
+                            onClick={() => navigate('/notifications')}
+                            className="relative p-2 rounded-xl text-white/50 hover:text-white hover:bg-white/10 transition-all"
+                        >
+                            <Bell size={20} />
+                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#17ce3c] rounded-full shadow-[0_0_6px_#17ce3c]" />
+                        </button>
+
+                        {/* Profile */}
+                        <button
+                            onClick={() => navigate('/profile')}
+                            className="flex items-center px-6 py-3 bg-[#1C7DF1] text-white rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
+                        >
+                            <User className="inline mr-2" size={16} />
+                            Profile
+                        </button>
+                    </div>
 
                     {/* Mobile Hamburger */}
                     <button
@@ -111,6 +120,15 @@ const Navbar = () => {
                                 {item.name}
                             </button>
                         ))}
+
+                        <button
+                            onClick={() => navigate('/notifications')}
+                            className="flex items-center justify-center gap-2 px-4 py-3 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                        >
+                            <Bell size={16} />
+                            Notifications
+                        </button>
+
                         <button
                             onClick={() => navigate('/profile')}
                             className="flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg font-medium hover:shadow-lg transition-all duration-300"

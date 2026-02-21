@@ -3,12 +3,12 @@ import Navbar from "../Components/Navbar"
 import Leaflet from "../Components/Leaflet"
 import EnvIcon from "../Components/Evicon"
 
-const stats = [
-  { value: "2.4M", label: "Active Users",     icon: "◈", color: "#1C7DF1" },
-  { value: "847",  label: "Cities Monitored", icon: "⬡", color: "#17ce3c" },
-  { value: "12K",  label: "Rewards Earned",   icon: "◆", color: "#ed8a26" },
-  { value: "98%",  label: "Data Accuracy",    icon: "▲", color: "#a855f7" },
-]
+// const stats = [
+//   { value: "2.4M", label: "Active Users",     icon: "◈", color: "#1C7DF1" },
+//   { value: "847",  label: "Cities Monitored", icon: "⬡", color: "#17ce3c" },
+//   { value: "12K",  label: "Rewards Earned",   icon: "◆", color: "#ed8a26" },
+//   { value: "98%",  label: "Data Accuracy",    icon: "▲", color: "#a855f7" },
+// ]
 
 export default function Homepage() {
   const canvasRef = useRef(null)
@@ -242,15 +242,15 @@ export default function Homepage() {
           </div>
         </div>
         <EnvIcon/>
-        <div className="stats-strip">
+        {/* <div className="stats-strip">
           {stats.map((s, i) => (
-            <div className="stat-item" key={i}>
-              <span className="stat-icon" style={{ color: s.color }}>{s.icon}</span>
-              <div className="stat-value" style={{ color: s.color }}>{s.value}</div>
-              <div className="stat-label">{s.label}</div>
-            </div>
+            // <div className="stat-item" key={i}>
+            //   <span className="stat-icon" style={{ color: s.color }}>{s.icon}</span>
+            //   <div className="stat-value" style={{ color: s.color }}>{s.value}</div>
+            //   <div className="stat-label">{s.label}</div>
+            // </div>
           ))}
-        </div>
+        </div> */}
       </section>
       {/* <div className=" bg-gradient-to-b from-[#050a06] to-[#f2f6f9]  px-14 py-12 "/> */}
           <Leaflet/>

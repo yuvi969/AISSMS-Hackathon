@@ -26,6 +26,7 @@ import { useEffect, useState } from "react"
 
     return (
       <>
+       
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:wght@400;700&display=swap');
           .syne { font-family: 'Syne', sans-serif; }

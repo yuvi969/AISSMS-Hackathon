@@ -1,3 +1,4 @@
+import Navbar from "../Components/Navbar"
 const TODO_ITEMS = [
   { num: '01', emoji: '🪣', title: 'Reduce Water Waste',            tag: 'Home',      desc: 'Turn off the tap while brushing. Collect rainwater for plants. Fix dripping faucets — one drip wastes 20 litres a day.' },
   { num: '02', emoji: '♻️', title: 'Segregate Your Waste',          tag: 'Waste',     desc: 'Separate dry, wet, and hazardous waste. Compost organic kitchen scraps into nutrient-rich soil for your garden.' },
@@ -21,7 +22,9 @@ const SUGGESTIONS = [
 
 const KnowYourEnv = () => {
   return (
-    <div className="bg-black min-h-screen text-white overflow-x-hidden">
+    <> 
+    <Navbar />
+    <div className="bg-black min-h-screen text-white overflow-x-hidden pt-15">
 
       {/* ── HEADER ───────────────────────────────────────────────── */}
       <div
@@ -221,6 +224,7 @@ const KnowYourEnv = () => {
       </div>
 
     </div>
+    </>    
   )
 }
 

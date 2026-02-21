@@ -9,9 +9,12 @@ import Water from "./Pages/Water";
 import Login from "./Pages/Login"
 import Signup from "./Pages/Signup"
 import Form from "./Pages/Form"
+import Noise from "./Pages/Noise";
+import Forest from "./Pages/ForestCover";
 
 const App = () => {
   return (
+    <>
     <Routes>
       <Route path="/" element={<Homepage />} />
       <Route path="/dashboard" element={<Dashboard />} />
@@ -22,8 +25,11 @@ const App = () => {
       <Route path="/water" element={<Water />} />
       <Route path="/login"element={<Login />} />
       <Route path="/signup"element={<Signup />} />
-       <Route path="/form"element={<Form />} />
+      <Route path="/form"element={<Form />} />
+      <Route path="/noise"element={<Noise />} />
+      <Route path="/forest"element={<Forest />} />
     </Routes>
+    </>
   )
 }
 

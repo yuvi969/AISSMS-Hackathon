@@ -40,7 +40,67 @@ const CITIES = [
   { id: 7, name: "Hyderabad", lat: 17.3850, lon: 78.4867 },
   { id: 8, name: "Pune", lat: 18.5204, lon: 73.8567 },
   { id: 9, name: "Jaipur", lat: 26.9124, lon: 75.7873 },
-  { id: 10, name: "Los Angeles", lat: 34.0522, lon: -118.2437 }
+  { id: 10, name: "Los Angeles", lat: 34.0522, lon: -118.2437 },
+
+  // 🇺🇸 USA
+  { id: 11, name: "Washington, D.C.", lat: 38.9072, lon: -77.0369 },
+
+  // 🇬🇧 UK
+  { id: 12, name: "London", lat: 51.5074, lon: -0.1278 },
+
+  // 🇫🇷 France
+  { id: 13, name: "Paris", lat: 48.8566, lon: 2.3522 },
+
+  // 🇩🇪 Germany
+  { id: 14, name: "Berlin", lat: 52.5200, lon: 13.4050 },
+
+  // 🇯🇵 Japan
+  { id: 15, name: "Tokyo", lat: 35.6762, lon: 139.6503 },
+
+  // 🇨🇳 China
+  { id: 16, name: "Beijing", lat: 39.9042, lon: 116.4074 },
+
+  // 🇷🇺 Russia
+  { id: 17, name: "Moscow", lat: 55.7558, lon: 37.6173 },
+
+  // 🇦🇺 Australia
+  { id: 18, name: "Canberra", lat: -35.2809, lon: 149.1300 },
+
+  // 🇨🇦 Canada
+  { id: 19, name: "Ottawa", lat: 45.4215, lon: -75.6972 },
+
+  // 🇧🇷 Brazil
+  { id: 20, name: "Brasília", lat: -15.8267, lon: -47.9218 },
+
+  // 🇮🇹 Italy
+  { id: 21, name: "Rome", lat: 41.9028, lon: 12.4964 },
+
+  // 🇪🇸 Spain
+  { id: 22, name: "Madrid", lat: 40.4168, lon: -3.7038 },
+
+  // 🇰🇷 South Korea
+  { id: 23, name: "Seoul", lat: 37.5665, lon: 126.9780 },
+
+  // 🇸🇬 Singapore
+  { id: 24, name: "Singapore", lat: 1.3521, lon: 103.8198 },
+
+  // 🇿🇦 South Africa
+  { id: 25, name: "Pretoria", lat: -25.7479, lon: 28.2293 },
+
+  // 🇦🇪 UAE
+  { id: 26, name: "Abu Dhabi", lat: 24.4539, lon: 54.3773 },
+
+  // 🇸🇦 Saudi Arabia
+  { id: 27, name: "Riyadh", lat: 24.7136, lon: 46.6753 },
+
+  // 🇹🇷 Turkey
+  { id: 28, name: "Ankara", lat: 39.9334, lon: 32.8597 },
+
+  // 🇲🇽 Mexico
+  { id: 29, name: "Mexico City", lat: 19.4326, lon: -99.1332 },
+
+  // 🇦🇷 Argentina
+  { id: 30, name: "Buenos Aires", lat: -34.6037, lon: -58.3816 }
 ];
 
 // Get AQI category and color

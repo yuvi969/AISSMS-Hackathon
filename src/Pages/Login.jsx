@@ -26,148 +26,88 @@ export default function Login() {
   }
 
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono&display=swap');
+    <div className="min-h-screen flex items-center justify-center px-6 bg-[#050a06] pt-20">
 
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
+      <div className="w-full max-w-sm bg-[#0d140e]/90 border border-white/8 rounded-3xl px-9 py-10 shadow-2xl backdrop-blur-xl">
 
-        .auth-root {
-          min-height: 100vh;
-          display: flex; align-items: center; justify-content: center;
-          padding: 24px;
-          font-family: 'Syne', sans-serif;
-          background:
-            radial-gradient(ellipse 70% 50% at 50% 0%, rgba(23,206,60,0.07) 0%, transparent 70%),
-            #050a06;
-        }
-        .auth-card {
-          width: 100%; max-width: 420px;
-          background: rgba(13,20,14,0.9);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 24px; padding: 40px 36px;
-          backdrop-filter: blur(20px);
-          box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-          animation: fadeUp 0.5s ease both;
-        }
-        .auth-logo {
-          font-size: 28px; font-weight: 800;
-          background: linear-gradient(135deg, #08a728, #99d64f, #ed8a26);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text; margin-bottom: 6px;
-        }
-        .auth-tagline {
-          font-family: 'Space Mono', monospace; font-size: 10px;
-          color: rgba(255,255,255,0.25); letter-spacing: 2px;
-          text-transform: uppercase; margin-bottom: 32px;
-        }
-        .auth-title { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 4px; }
-        .auth-sub   { font-size: 13px; color: rgba(255,255,255,0.35); margin-bottom: 28px; }
+        {/* Logo */}
+        <div className="text-3xl font-extrabold bg-gradient-to-r from-[#08a728] via-[#99d64f] to-[#ed8a26] bg-clip-text text-transparent mb-1">
+          EcoSimple
+        </div>
+        <div className="text-[10px] font-mono text-white/25 tracking-widest uppercase mb-8">
+          Environmental Intelligence Platform
+        </div>
 
-        .field-label {
-          display: block; font-size: 12px; font-weight: 600;
-          color: rgba(255,255,255,0.5); letter-spacing: 0.5px; margin-bottom: 8px;
-        }
-        .field-wrap { position: relative; margin-bottom: 16px; }
-        .field-icon {
-          position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-          color: rgba(255,255,255,0.2); width: 16px; height: 16px; pointer-events: none;
-        }
-        .field-input {
-          width: 100%; padding: 12px 14px 12px 42px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid rgba(255,255,255,0.09);
-          border-radius: 12px; color: #fff;
-          font-family: 'Syne', sans-serif; font-size: 14px;
-          outline: none; transition: border-color 0.2s, background 0.2s;
-          box-sizing: border-box;
-        }
-        .field-input::placeholder { color: rgba(255,255,255,0.2); }
-        .field-input:focus { border-color: rgba(23,206,60,0.4); background: rgba(23,206,60,0.04); }
+        <h1 className="text-xl font-bold text-white mb-1">Welcome back</h1>
+        <p className="text-sm text-white/35 mb-7">Sign in to your account</p>
 
-        .eye-btn {
-          position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-          background: none; border: none; color: rgba(255,255,255,0.25);
-          cursor: pointer; padding: 0; display: flex; transition: color 0.2s;
-        }
-        .eye-btn:hover { color: rgba(255,255,255,0.6); }
+        {/* Error */}
+        {error && (
+          <div className="px-4 py-2.5 mb-5 bg-red-500/10 border border-red-500/25 rounded-xl text-sm text-red-400">
+            ⚠ {error}
+          </div>
+        )}
 
-        .auth-error {
-          padding: 10px 14px; background: rgba(255,68,68,0.1);
-          border: 1px solid rgba(255,68,68,0.25); border-radius: 10px;
-          font-size: 13px; color: #ff8080; margin-bottom: 16px;
-        }
-        .submit-btn {
-          width: 100%; padding: 13px;
-          background: linear-gradient(135deg, #17ce3c, #0aad32);
-          border: none; border-radius: 12px; color: #050a06;
-          font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800;
-          cursor: pointer; box-shadow: 0 4px 20px rgba(23,206,60,0.3);
-          transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s; margin-top: 8px;
-        }
-        .submit-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(23,206,60,0.45); }
-        .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-        .auth-divider {
-          text-align: center; margin-top: 24px; padding-top: 20px;
-          border-top: 1px solid rgba(255,255,255,0.06);
-          font-size: 13px; color: rgba(255,255,255,0.3);
-        }
-        .auth-link { color: #17ce3c; text-decoration: none; font-weight: 700; transition: opacity 0.2s; }
-        .auth-link:hover { opacity: 0.75; }
-
-        .spinner {
-          width: 16px; height: 16px;
-          border: 2px solid rgba(5,10,6,0.3); border-top-color: #050a06;
-          border-radius: 50%; animation: spin 0.7s linear infinite;
-          display: inline-block; vertical-align: middle; margin-right: 8px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-      `}</style>
-
-      <div className="auth-root">
-        <div className="auth-card">
-          <div className="auth-logo">EcoSimple</div>
-          <div className="auth-tagline">Environmental Intelligence Platform</div>
-          <div className="auth-title">Welcome back</div>
-          <div className="auth-sub">Sign in to your account</div>
-
-          {error && <div className="auth-error">⚠ {error}</div>}
-
-          <form onSubmit={handleSubmit}>
-            <label className="field-label">Email</label>
-            <div className="field-wrap">
-              <input className="field-input" type="email" placeholder="you@example.com"
-                value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-              <Mail className="field-icon" />
+          {/* Email */}
+          <div>
+            <label className="block text-xs font-semibold text-white/50 tracking-wide mb-2">Email</label>
+            <div className="relative">
+              <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" />
+              <input
+                type="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+                className="w-full pl-10 pr-4 py-3 bg-white/4 border border-white/9 rounded-xl text-white text-sm placeholder:text-white/20 outline-none focus:border-green-500/40 focus:bg-green-500/4 transition"
+              />
             </div>
+          </div>
 
-            <label className="field-label">Password</label>
-            <div className="field-wrap">
-              <input className="field-input" type={showPass ? "text" : "password"}
-                placeholder="••••••••" value={form.password}
+          {/* Password */}
+          <div>
+            <label className="block text-xs font-semibold text-white/50 tracking-wide mb-2">Password</label>
+            <div className="relative">
+              <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20 pointer-events-none" />
+              <input
+                type={showPass ? "text" : "password"}
+                placeholder="••••••••"
+                value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                required style={{ paddingRight: "42px" }} />
-              <Lock className="field-icon" />
-              <button type="button" className="eye-btn" onClick={() => setShowPass(!showPass)}>
-                {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+                required
+                className="w-full pl-10 pr-10 py-3 bg-white/4 border border-white/9 rounded-xl text-white text-sm placeholder:text-white/20 outline-none focus:border-green-500/40 focus:bg-green-500/4 transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPass(!showPass)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/60 transition"
+              >
+                {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
             </div>
-
-            <button className="submit-btn" type="submit" disabled={loading}>
-              {loading ? <><span className="spinner" />Signing in...</> : "Sign In →"}
-            </button>
-          </form>
-
-          <div className="auth-divider">
-            Don't have an account?{" "}
-            <Link to="/signup" className="auth-link">Create one</Link>
           </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 mt-2 bg-gradient-to-r from-[#17ce3c] to-[#0aad32] text-[#050a06] font-bold text-sm rounded-xl shadow-lg shadow-green-500/20 hover:-translate-y-0.5 hover:shadow-green-500/40 transition disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {loading ? "Signing in..." : "Sign In →"}
+          </button>
+        </form>
+
+        {/* Footer */}
+        <div className="text-center mt-6 pt-5 border-t border-white/6 text-sm text-white/30">
+          Don't have an account?{" "}
+          <Link to="/signup" className="text-[#17ce3c] font-bold hover:opacity-75 transition">
+            Create one
+          </Link>
         </div>
+
       </div>
-    </>
+    </div>
   )
 }

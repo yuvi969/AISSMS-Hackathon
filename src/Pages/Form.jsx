@@ -1,6 +1,8 @@
 import { useState, useRef } from "react"
-import { Upload, X, Send } from "lucide-react"
+import { Upload, X, Send, ArrowLeft, CheckCircle } from "lucide-react"
 import { submitTicket } from "../api.js"
+import { useNavigate } from "react-router-dom"
+import Navbar from '../Components/Navbar'
 
 const TRANSPORT_TYPES = ["Bus", "Train", "Metro"]
 
@@ -12,6 +14,7 @@ export default function Form() {
   const [success, setSuccess] = useState(false)
   const [error, setError]     = useState("")
   const fileRef = useRef()
+  const navigate = useNavigate()
 
   const handleChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -56,124 +59,229 @@ export default function Form() {
     setImage(null); setPreview(null); setSuccess(false); setError("")
   }
 
-  if (success) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-10 max-w-sm w-full text-center">
-          <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Send className="text-green-600" size={24} />
-          </div>
-          <h2 className="text-xl font-bold text-slate-800 mb-2">Ticket Submitted!</h2>
-          <p className="text-slate-500 text-sm mb-6">Your ticket has been received successfully.</p>
-          <button
-            onClick={reset}
-            className="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold rounded-xl transition-colors"
-          >
-            Submit Another
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center py-12 px-4">
-      <div className="w-full max-w-md">
+    <>
+      <Navbar />
+      <div className="min-h-screen text-white pt-28 pb-16 px-6" style={{ background: '#050a06' }}>
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono&display=swap');
 
-        <div className="mb-7">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1">Public Transport Portal</p>
-          <h1 className="text-2xl font-bold text-slate-800">Upload Your Ticket</h1>
-        </div>
+          .form-root { font-family: 'Syne', sans-serif; }
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+          .glass {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 24px;
+          }
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5">Full Name</label>
-            <input
-              name="name" required value={form.name} onChange={handleChange}
-              placeholder="Name "
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-700 focus:outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100 transition"
-            />
-          </div>
+          .field-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Syne', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, background 0.2s;
+            box-sizing: border-box;
+          }
+          .field-input::placeholder { color: rgba(255,255,255,0.2); }
+          .field-input:focus {
+            border-color: rgba(8,167,40,0.4);
+            background: rgba(8,167,40,0.04);
+          }
+          .field-input option { background: #0d140e; color: #fff; }
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5">Email</label>
-            <input
-              type="email" name="email" required value={form.email} onChange={handleChange}
-              placeholder="anyabankar@example.com"
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-700 focus:outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100 transition"
-            />
-          </div>
+          .field-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+          }
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5">Transport Type</label>
-            <select
-              name="transportType" required value={form.transportType} onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-700 focus:outline-none focus:border-slate-400 focus:ring-2 focus:ring-slate-100 transition"
-            >
-              <option value="">Select type</option>
-              {TRANSPORT_TYPES.map((t) => <option key={t}>{t}</option>)}
-            </select>
-          </div>
+          .drop-zone {
+            cursor: pointer;
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.25);
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.02);
+          }
+          .drop-zone:hover {
+            border-color: rgba(8,167,40,0.35);
+            background: rgba(8,167,40,0.04);
+            color: rgba(255,255,255,0.5);
+          }
 
-          {/* Image Upload */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-500 mb-1.5">
-              Ticket Image <span className="text-red-400">*</span>
-            </label>
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImage} />
+          .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #17ce3c, #0aad32);
+            border: none;
+            border-radius: 14px;
+            color: #050a06;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(23,206,60,0.3);
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+          }
+          .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(23,206,60,0.45);
+          }
+          .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-            {preview ? (
-              <div className="relative rounded-xl overflow-hidden border border-slate-200">
-                <img src={preview} alt="Ticket" className="w-full max-h-56 object-contain bg-slate-50" />
-                <button
-                  type="button"
-                  onClick={() => { setImage(null); setPreview(null) }}
-                  className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white p-1.5 rounded-full transition-colors"
-                >
-                  <X size={14} />
-                </button>
-                <div className="px-3 py-2 bg-slate-50 border-t border-slate-100 text-xs text-slate-400 truncate">
-                  {image?.name}
-                </div>
-              </div>
-            ) : (
-              <div
-                onClick={() => fileRef.current.click()}
-                onDrop={handleDrop}
-                onDragOver={(e) => e.preventDefault()}
-                className="cursor-pointer w-full py-10 rounded-xl border-2 border-dashed border-slate-200
-                           hover:border-slate-400 bg-slate-50 hover:bg-slate-100
-                           flex flex-col items-center gap-2 text-slate-400 hover:text-slate-600 transition-all"
-              >
-                <Upload size={22} />
-                <p className="text-sm font-semibold">Click or drag & drop</p>
-                <p className="text-xs text-slate-300">JPG, PNG, WEBP — max 10MB</p>
-              </div>
-            )}
-          </div>
+          .fade-in { animation: fadeUp 0.45s ease both; }
+          @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+        `}</style>
 
-          {error && (
-            <p className="text-sm text-red-500 bg-red-50 border border-red-100 rounded-xl px-4 py-3">
-              {error}
-            </p>
-          )}
+        <div className="form-root max-w-lg mx-auto">
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-3 bg-slate-800 hover:bg-slate-700
-                       disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors shadow-md"
-          >
-            {loading
-              ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              : <Send size={14} />
-            }
-            {loading ? "Submitting..." : "Submit Ticket"}
+          {/* Back */}
+          <button onClick={() => navigate('/')}
+            className="flex items-center gap-2 text-white/30 hover:text-white text-sm transition mb-8">
+            <ArrowLeft size={15} /> Back
           </button>
 
-        </form>
+          {/* Success state */}
+          {success ? (
+            <div className="glass p-10 text-center fade-in">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
+                style={{ background: 'rgba(23,206,60,0.12)', border: '1px solid rgba(23,206,60,0.25)' }}>
+                <CheckCircle size={28} style={{ color: '#17ce3c' }} />
+              </div>
+              <h2 className="text-2xl font-extrabold text-white mb-2">Ticket Submitted!</h2>
+              <p className="text-white/40 text-sm mb-8">Your ticket has been received successfully. You'll earn credits for using public transport.</p>
+              <button onClick={reset} className="submit-btn" style={{ maxWidth: 200, margin: '0 auto' }}>
+                Submit Another
+              </button>
+            </div>
+          ) : (
+            <>
+              {/* Header */}
+              <div className="mb-8 fade-in">
+                <p className="text-xs font-mono text-white/25 tracking-[3px] uppercase mb-2">◈ Public Transport Portal</p>
+                <h1 className="text-3xl font-extrabold text-white">Upload Your Ticket</h1>
+                <p className="text-white/35 text-sm mt-2">Submit your public transport ticket to earn eco credits.</p>
+              </div>
+
+              {/* Form card */}
+              <div className="glass p-8 fade-in space-y-5">
+
+                {/* Starting point */}
+                <div>
+                  <label className="field-label">Starting Point</label>
+                  <input
+                    name="name" required value={form.name} onChange={handleChange}
+                    placeholder="e.g. Shivajinagar"
+                    className="field-input"
+                  />
+                </div>
+
+                {/* Destination */}
+                <div>
+                  <label className="field-label">Destination</label>
+                  <input
+                    name="email" required value={form.email} onChange={handleChange}
+                    placeholder="e.g. Pune Station"
+                    className="field-input"
+                  />
+                </div>
+
+                {/* Transport type */}
+                <div>
+                  <label className="field-label">Transport Type</label>
+                  <select
+                    name="transportType" required value={form.transportType} onChange={handleChange}
+                    className="field-input"
+                  >
+                    <option value="">Select type</option>
+                    {TRANSPORT_TYPES.map((t) => <option key={t}>{t}</option>)}
+                  </select>
+                </div>
+
+                {/* Image upload */}
+                <div>
+                  <label className="field-label">
+                    Ticket Image <span style={{ color: '#f87171' }}>*</span>
+                  </label>
+                  <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImage} />
+
+                  {preview ? (
+                    <div className="relative rounded-2xl overflow-hidden"
+                      style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <img src={preview} alt="Ticket"
+                        className="w-full object-contain"
+                        style={{ maxHeight: 220, background: 'rgba(255,255,255,0.02)' }} />
+                      <button
+                        type="button"
+                        onClick={() => { setImage(null); setPreview(null) }}
+                        className="absolute top-3 right-3 p-1.5 rounded-full transition"
+                        style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}
+                      >
+                        <X size={14} />
+                      </button>
+                      <div className="px-4 py-2.5 text-xs truncate"
+                        style={{ borderTop: '1px solid rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.3)' }}>
+                        {image?.name}
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="drop-zone"
+                      onClick={() => fileRef.current.click()}
+                      onDrop={handleDrop}
+                      onDragOver={(e) => e.preventDefault()}
+                    >
+                      <Upload size={22} />
+                      <p className="text-sm font-semibold">Click or drag & drop</p>
+                      <p className="text-xs" style={{ color: 'rgba(255,255,255,0.15)' }}>JPG, PNG, WEBP — max 10MB</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Error */}
+                {error && (
+                  <div className="px-4 py-3 rounded-xl text-sm"
+                    style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
+                    ⚠ {error}
+                  </div>
+                )}
+
+                {/* Submit */}
+                <button type="button" onClick={handleSubmit} disabled={loading} className="submit-btn">
+                  {loading
+                    ? <span className="w-4 h-4 border-2 rounded-full animate-spin"
+                        style={{ borderColor: 'rgba(5,10,6,0.3)', borderTopColor: '#050a06' }} />
+                    : <Send size={15} />
+                  }
+                  {loading ? "Submitting..." : "Submit Ticket"}
+                </button>
+
+              </div>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
