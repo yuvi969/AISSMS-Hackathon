@@ -2,9 +2,10 @@ import { useState, useEffect } from "react"
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import L from "leaflet"
-import { MapPin} from "lucide-react"
+import { MapPin, RefreshCw, Loader } from "lucide-react"
+import { getAQIForMultipleCities } from "../api"
 
-// Fix broken marker icons in Vite/Webpack
+// Fix broken marker icons
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
@@ -28,25 +29,28 @@ const createPulseIcon = (color = "#16a34a") =>
     iconAnchor: [7, 7],
   })
 
-// Env monitoring hotspots
-const hotspots = [
-  { id: 1, pos: [28.6139, 77.2090], label: "New Delhi", aqi: 187, temp: 32, type: "critical", color: "#ef4444" },
-  { id: 2, pos: [19.0760, 72.8777], label: "Mumbai", aqi: 98, temp: 29, type: "moderate", color: "#f97316" },
-  { id: 3, pos: [12.9716, 77.5946], label: "Bengaluru", aqi: 52, temp: 24, type: "good", color: "#16a34a" },
-  { id: 4, pos: [22.5726, 88.3639], label: "Kolkata", aqi: 143, temp: 31, type: "unhealthy", color: "#ea580c" },
-  { id: 5, pos: [13.0827, 80.2707], label: "Chennai", aqi: 71, temp: 33, type: "moderate", color: "#f97316" },
-  { id: 6, pos: [23.0225, 72.5714], label: "Ahmedabad", aqi: 112, temp: 35, type: "unhealthy", color: "#ea580c" },
-  { id: 7, pos: [17.3850, 78.4867], label: "Hyderabad", aqi: 63, temp: 27, type: "good", color: "#16a34a" },
-  { id: 8, pos: [18.5204, 73.8567], label: "Pune", aqi: 44, temp: 25, type: "good", color: "#16a34a" },
-  { id: 9, pos: [24.7101, 46.6821], label: "Riyadh", aqi: 80, temp: 35, type: "critical", color: "#ef4444" },
-]
+// Cities to monitor - with coordinates
+const CITIES = [
+  { id: 1, name: "New Delhi", lat: 28.6139, lon: 77.2090 },
+  { id: 2, name: "Mumbai", lat: 19.0760, lon: 72.8777 },
+  { id: 3, name: "Bengaluru", lat: 12.9716, lon: 77.5946 },
+  { id: 4, name: "Kolkata", lat: 22.5726, lon: 88.3639 },
+  { id: 5, name: "Chennai", lat: 13.0827, lon: 80.2707 },
+  { id: 6, name: "Ahmedabad", lat: 23.0225, lon: 72.5714 },
+  { id: 7, name: "Hyderabad", lat: 17.3850, lon: 78.4867 },
+  { id: 8, name: "Pune", lat: 18.5204, lon: 73.8567 },
+  { id: 9, name: "Jaipur", lat: 26.9124, lon: 75.7873 },
+  { id: 10, name: "Los Angeles", lat: 34.0522, lon: -118.2437 }
+];
 
-const aqiLabel = (aqi) => {
-  if (aqi <= 50) return "Good"
-  if (aqi <= 100) return "Moderate"
-  if (aqi <= 150) return "Unhealthy for Some"
-  if (aqi <= 200) return "Unhealthy"
-  return "Hazardous"
+// Get AQI category and color
+const getAQIConfig = (aqi) => {
+  if (aqi === 1) return { label: "Good", color: "#16a34a", type: "good" }
+  if (aqi === 2) return { label: "Fair", color: "#84cc16", type: "fair" }
+  if (aqi === 3) return { label: "Moderate", color: "#f97316", type: "moderate" }
+  if (aqi === 4) return { label: "Poor", color: "#ef4444", type: "unhealthy" }
+  if (aqi === 5) return { label: "Very Poor", color: "#991b1b", type: "critical" }
+  return { label: "Unknown", color: "#6b7280", type: "unknown" }
 }
 
 // Fly to user location
@@ -54,14 +58,80 @@ const FlyToLocation = ({ position }) => {
   const map = useMap()
   useEffect(() => {
     if (position) map.flyTo(position, 12, { duration: 2 })
-  }, [position])
+  }, [position, map])
   return null
 }
 
-export default function Leaflet() {
+export default function DynamicLeafletMap() {
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState("all")
   const [userPos, setUserPos] = useState(null)
+  const [hotspots, setHotspots] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // Fetch real AQI data for all cities
+  const fetchCitiesAQI = async () => {
+    setLoading(true)
+    setError(null)
+    
+    try {
+      const results = await getAQIForMultipleCities(CITIES)
+      
+      // Transform API data into hotspot format
+      const transformedData = results.map(city => {
+        if (!city.success || !city.aqiData) {
+          return {
+            id: city.id,
+            pos: [city.lat, city.lon],
+            label: city.name,
+            aqi: 0,
+            aqiValue: 0,
+            pm25: 0,
+            temp: 0,
+            type: "unknown",
+            color: "#6b7280",
+            error: true
+          }
+        }
+
+        const config = getAQIConfig(city.aqiData.aqi)
+        
+        return {
+          id: city.id,
+          pos: [city.lat, city.lon],
+          label: city.name,
+          aqi: city.aqiData.aqi,
+          aqiValue: city.aqiData.aqi,
+          pm25: city.aqiData.pm2_5,
+          pm10: city.aqiData.pm10,
+          o3: city.aqiData.o3,
+          no2: city.aqiData.no2,
+          so2: city.aqiData.so2,
+          co: city.aqiData.co,
+          temp: 25, // You can add weather API here
+          type: config.type,
+          color: config.color,
+          aqiLabel: config.label,
+          summary: city.recommendations?.summary || "",
+          actions: city.recommendations?.actions || [],
+          alerts: city.recommendations?.alerts || []
+        }
+      })
+      
+      setHotspots(transformedData)
+    } catch (err) {
+      console.error('Error fetching cities AQI:', err)
+      setError('Failed to load AQI data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Load data on mount
+  useEffect(() => {
+    fetchCitiesAQI()
+  }, [])
 
   const handleLocate = () => {
     navigator.geolocation.getCurrentPosition(
@@ -76,27 +146,28 @@ export default function Leaflet() {
     return matchSearch && matchFilter
   })
 
-  const filterOptions = ["all", "good", "moderate", "unhealthy", "critical"]
+  const filterOptions = ["all", "good", "fair", "moderate", "unhealthy", "critical"]
 
   const filterColors = {
     all: "bg-slate-100 text-slate-600 border-slate-200 hover:border-slate-400",
-    good: "bg-green-50  text-green-700  border-green-200 hover:border-green-400",
+    good: "bg-green-50 text-green-700 border-green-200 hover:border-green-400",
+    fair: "bg-lime-50 text-lime-700 border-lime-200 hover:border-lime-400",
     moderate: "bg-orange-50 text-orange-600 border-orange-200 hover:border-orange-400",
-    unhealthy: "bg-red-50    text-red-600    border-red-200   hover:border-red-400",
-    critical: "bg-rose-50   text-rose-700   border-rose-200  hover:border-rose-400",
+    unhealthy: "bg-red-50 text-red-600 border-red-200 hover:border-red-400",
+    critical: "bg-rose-50 text-rose-700 border-rose-200 hover:border-rose-400",
   }
 
   const filterActiveColors = {
-    all: "bg-slate-200  text-slate-800  border-slate-400",
-    good: "bg-green-100  text-green-800  border-green-500",
+    all: "bg-slate-200 text-slate-800 border-slate-400",
+    good: "bg-green-100 text-green-800 border-green-500",
+    fair: "bg-lime-100 text-lime-800 border-lime-500",
     moderate: "bg-orange-100 text-orange-700 border-orange-500",
-    unhealthy: "bg-red-100    text-red-700    border-red-500",
-    critical: "bg-rose-100   text-rose-800   border-rose-500",
+    unhealthy: "bg-red-100 text-red-700 border-red-500",
+    critical: "bg-rose-100 text-rose-800 border-rose-500",
   }
 
   return (
     <>
-      
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
@@ -109,7 +180,6 @@ export default function Leaflet() {
         .map-font { font-family: 'Syne', sans-serif; }
         .mono-font { font-family: 'Space Mono', monospace; }
 
-        /* Leaflet overrides for light theme */
         .leaflet-container {
           height: 100% !important;
           background: #f1f5f9 !important;
@@ -138,7 +208,7 @@ export default function Leaflet() {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="mono-font text-[10px] text-green-600 tracking-[3px] uppercase mb-2">
-            ◈ Live Data
+            ◈ Live Data from OpenWeather API
           </div>
           <h2 className="text-4xl font-extrabold text-slate-800 tracking-tight">
             Air Quality Intelligence
@@ -168,105 +238,173 @@ export default function Leaflet() {
 
           <button
             onClick={handleLocate}
-            className="px-4 py-2.5 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-200 transition-all whitespace-nowrap"
+            className="px-4 py-2.5 bg-blue-500 hover:bg-blue-600 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-200 transition-all whitespace-nowrap flex items-center gap-2"
           >
-            <MapPin /> Locate Me
+            <MapPin size={16} /> Locate Me
+          </button>
+
+          <button
+            onClick={fetchCitiesAQI}
+            disabled={loading}
+            className="px-4 py-2.5 bg-green-500 hover:bg-green-600 active:scale-95 text-white text-xs font-bold rounded-xl shadow-md shadow-green-200 transition-all whitespace-nowrap flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? <Loader size={16} className="animate-spin" /> : <RefreshCw size={16} />}
+            {loading ? 'Loading...' : 'Refresh'}
           </button>
         </div>
 
+        {/* Error message */}
+        {error && (
+          <div className="max-w-5xl mx-auto mb-4 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-red-700 text-sm">
+            {error}
+          </div>
+        )}
+
         {/* Map wrapper */}
         <div className="relative max-w-5xl mx-auto h-[520px] rounded-2xl overflow-hidden border border-slate-200 shadow-2xl shadow-slate-200">
-          <MapContainer
-            center={[20.5937, 78.9629]}
-            zoom={5}
-            scrollWheelZoom={true}
-            style={{ width: "100%", height: "100%" }}
-            zoomControl={false}
-          >
-            {/* Light tile layer */}
-            <TileLayer
-              attribution='&copy; <a href="https://carto.com/">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-            />
+          {loading && hotspots.length === 0 ? (
+            <div className="flex items-center justify-center h-full bg-slate-100">
+              <div className="text-center">
+                <Loader className="animate-spin mx-auto mb-4 text-slate-400" size={48} />
+                <p className="text-slate-500">Loading real-time AQI data...</p>
+              </div>
+            </div>
+          ) : (
+            <MapContainer
+              center={[20.5937, 78.9629]}
+              zoom={5}
+              scrollWheelZoom={true}
+              style={{ width: "100%", height: "100%" }}
+              zoomControl={false}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://carto.com/">CARTO</a>'
+                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+              />
 
-            {/* User location */}
-            {userPos && (
-              <>
-                <FlyToLocation position={userPos} />
-                <Marker position={userPos} icon={createPulseIcon("#3b82f6")}>
-                  <Popup>
-                    <div className="text-slate-800">
-                      <strong className="text-sm">📍 You are here</strong>
-                      <div className="text-xs text-slate-400 mt-1">
-                        {userPos[0].toFixed(4)}, {userPos[1].toFixed(4)}
+              {/* User location */}
+              {userPos && (
+                <>
+                  <FlyToLocation position={userPos} />
+                  <Marker position={userPos} icon={createPulseIcon("#3b82f6")}>
+                    <Popup>
+                      <div className="text-slate-800">
+                        <strong className="text-sm">📍 You are here</strong>
+                        <div className="text-xs text-slate-400 mt-1">
+                          {userPos[0].toFixed(4)}, {userPos[1].toFixed(4)}
+                        </div>
                       </div>
+                    </Popup>
+                  </Marker>
+                  <Circle
+                    center={userPos} radius={4000}
+                    pathOptions={{ color: "#3b82f6", fillColor: "#3b82f6", fillOpacity: 0.08, weight: 1 }}
+                  />
+                </>
+              )}
+
+              {/* City hotspots with REAL data */}
+              {filtered.map((spot) => (
+                <Marker key={spot.id} position={spot.pos} icon={createPulseIcon(spot.color)}>
+                  <Popup>
+                    <div style={{ minWidth: 200, color: "#0f172a" }}>
+                      <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 12 }}>
+                        {spot.label}
+                      </div>
+
+                      {/* AQI row */}
+                      <div style={{
+                        display: "flex", justifyContent: "space-between", alignItems: "center",
+                        padding: "8px 12px",
+                        background: `${spot.color}15`,
+                        border: `1px solid ${spot.color}40`,
+                        borderRadius: 10, marginBottom: 8
+                      }}>
+                        <span style={{ fontSize: 11, color: "#94a3b8" }}>AQI Level</span>
+                        <span style={{ fontWeight: 800, fontSize: 22, color: spot.color }}>
+                          {spot.aqi}
+                        </span>
+                      </div>
+
+                      {/* Status */}
+                      <div style={{
+                        padding: "8px 12px",
+                        background: "#f8fafc",
+                        borderRadius: 8,
+                        border: "1px solid #e2e8f0",
+                        marginBottom: 8
+                      }}>
+                        <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 4 }}>STATUS</div>
+                        <div style={{ fontWeight: 700, fontSize: 14, color: spot.color }}>
+                          {spot.aqiLabel}
+                        </div>
+                        {spot.summary && (
+                          <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>
+                            {spot.summary}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Pollutants */}
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: 6,
+                        marginBottom: 8
+                      }}>
+                        <div style={{ padding: 6, background: "#f8fafc", borderRadius: 6, fontSize: 10 }}>
+                          <div style={{ color: "#94a3b8" }}>PM2.5</div>
+                          <div style={{ fontWeight: 700, color: "#0f172a" }}>{spot.pm25?.toFixed(1)}</div>
+                        </div>
+                        <div style={{ padding: 6, background: "#f8fafc", borderRadius: 6, fontSize: 10 }}>
+                          <div style={{ color: "#94a3b8" }}>PM10</div>
+                          <div style={{ fontWeight: 700, color: "#0f172a" }}>{spot.pm10?.toFixed(1)}</div>
+                        </div>
+                        <div style={{ padding: 6, background: "#f8fafc", borderRadius: 6, fontSize: 10 }}>
+                          <div style={{ color: "#94a3b8" }}>O3</div>
+                          <div style={{ fontWeight: 700, color: "#0f172a" }}>{spot.o3?.toFixed(1)}</div>
+                        </div>
+                        <div style={{ padding: 6, background: "#f8fafc", borderRadius: 6, fontSize: 10 }}>
+                          <div style={{ color: "#94a3b8" }}>NO2</div>
+                          <div style={{ fontWeight: 700, color: "#0f172a" }}>{spot.no2?.toFixed(1)}</div>
+                        </div>
+                      </div>
+
+                      {/* Top action */}
+                      {spot.actions && spot.actions[0] && (
+                        <div style={{
+                          fontSize: 10,
+                          color: "#64748b",
+                          padding: 8,
+                          background: "#f1f5f9",
+                          borderRadius: 6
+                        }}>
+                          💡 {spot.actions[0]}
+                        </div>
+                      )}
                     </div>
                   </Popup>
+
+                  <Circle
+                    center={spot.pos} radius={80000}
+                    pathOptions={{ color: spot.color, fillColor: spot.color, fillOpacity: 0.05, weight: 0.5 }}
+                  />
                 </Marker>
-                <Circle
-                  center={userPos} radius={4000}
-                  pathOptions={{ color: "#3b82f6", fillColor: "#3b82f6", fillOpacity: 0.08, weight: 1 }}
-                />
-              </>
-            )}
-
-            {/* City hotspots */}
-            {filtered.map((spot) => (
-              <Marker key={spot.id} position={spot.pos} icon={createPulseIcon(spot.color)}>
-                <Popup>
-                  <div style={{ minWidth: 160, color: "#0f172a" }}>
-                    <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 12 }}>{spot.label}</div>
-
-                    {/* AQI row */}
-                    <div style={{
-                      display: "flex", justifyContent: "space-between", alignItems: "center",
-                      padding: "8px 12px",
-                      background: `${spot.color}15`,
-                      border: `1px solid ${spot.color}40`,
-                      borderRadius: 10, marginBottom: 8
-                    }}>
-                      <span style={{ fontSize: 11, color: "#94a3b8" }}>AQI Index</span>
-                      <span style={{ fontWeight: 800, fontSize: 22, color: spot.color }}>{spot.aqi}</span>
-                    </div>
-
-                    {/* Temp + Status */}
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <div style={{
-                        flex: 1, padding: "8px", textAlign: "center",
-                        background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0"
-                      }}>
-                        <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 2 }}>TEMP</div>
-                        <div style={{ fontWeight: 700, fontSize: 16, color: "#0f172a" }}>{spot.temp}°C</div>
-                      </div>
-                      <div style={{
-                        flex: 1, padding: "8px", textAlign: "center",
-                        background: "#f8fafc", borderRadius: 8, border: "1px solid #e2e8f0"
-                      }}>
-                        <div style={{ fontSize: 10, color: "#94a3b8", marginBottom: 2 }}>STATUS</div>
-                        <div style={{ fontWeight: 700, fontSize: 11, color: spot.color }}>{aqiLabel(spot.aqi)}</div>
-                      </div>
-                    </div>
-                  </div>
-                </Popup>
-
-                <Circle
-                  center={spot.pos} radius={80000}
-                  pathOptions={{ color: spot.color, fillColor: spot.color, fillOpacity: 0.05, weight: 0.5 }}
-                />
-              </Marker>
-            ))}
-          </MapContainer>
+              ))}
+            </MapContainer>
+          )}
 
           {/* AQI Legend overlay */}
           <div className="absolute bottom-4 left-4 z-[1000] bg-white/90 backdrop-blur-md border border-slate-200 rounded-2xl px-4 py-3 min-w-[190px] shadow-lg">
             <div className="mono-font text-[9px] text-slate-400 tracking-[2px] uppercase mb-2">
-              AQI Legend
+              AQI Scale
             </div>
             {[
-              { color: "#16a34a", label: "Good (0 – 50)" },
-              { color: "#f97316", label: "Moderate (51 – 100)" },
-              { color: "#ea580c", label: "Unhealthy (101 – 150)" },
-              { color: "#ef4444", label: "Critical (150+)" },
+              { color: "#16a34a", label: "Good (1)" },
+              { color: "#84cc16", label: "Fair (2)" },
+              { color: "#f97316", label: "Moderate (3)" },
+              { color: "#ef4444", label: "Poor (4)" },
+              { color: "#991b1b", label: "Very Poor (5)" },
             ].map((l) => (
               <div key={l.label} className="flex items-center gap-2 mb-1.5 text-xs text-slate-500">
                 <div
