@@ -6,6 +6,9 @@ import LeaderBoard from "./Pages/LeaderBoard";
 import Profile from "./Pages/Profile";
 import AQI from "./Pages/AQI";
 import Water from "./Pages/Water";
+import Login from "./Pages/Login"
+import Signup from "./Pages/Signup"
+import Form from "./Pages/Form"
 
 const App = () => {
   return (
@@ -17,6 +20,9 @@ const App = () => {
       <Route path="/profile" element={<Profile />} /> 
       <Route path="/aqi" element={<AQI />} />
       <Route path="/water" element={<Water />} />
+      <Route path="/login"element={<Login />} />
+      <Route path="/signup"element={<Signup />} />
+       <Route path="/form"element={<Form />} />
     </Routes>
   )
 }
