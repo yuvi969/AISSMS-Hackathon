@@ -4,20 +4,38 @@ import { submitTicket } from "../api.js"
 import { useNavigate } from "react-router-dom"
 import Navbar from '../Components/Navbar'
 
+const STATIONS = [
+  "PCMC",
+  "Sant Tukaram Nagar",
+  "Bhosari",
+  "Kasarwadi",
+  "Phugewadi",
+  "Range Hills",
+  "Shivaji Nagar",
+  "Civil Court",
+  "Budhwar Peth",
+  "Mandai",
+  "Swargate",
+  "Vanaz",
+  "Ideal Colony",
+  "Nal Stop",
+  "Garware College",
+  "Deccan Gymkhana",
+]
+
 const TRANSPORT_TYPES = ["Bus", "Train", "Metro"]
 
 export default function Form() {
-  const [form, setForm]       = useState({ name: "", email: "", transportType: "" })
-  const [image, setImage]     = useState(null)
-  const [preview, setPreview] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [success, setSuccess] = useState(false)
-  const [error, setError]     = useState("")
+  const [source, setSource]           = useState("")
+  const [destination, setDestination] = useState("")
+  const [transportType, setTransportType] = useState("")
+  const [image, setImage]             = useState(null)
+  const [preview, setPreview]         = useState(null)
+  const [loading, setLoading]         = useState(false)
+  const [success, setSuccess]         = useState(false)
+  const [error, setError]             = useState("")
   const fileRef = useRef()
   const navigate = useNavigate()
-
-  const handleChange = (e) =>
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
 
   const handleImage = (e) => {
     const file = e.target.files[0]
@@ -37,15 +55,14 @@ export default function Form() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
-    if (!image) { setError("Please upload a ticket image."); return }
-
-    const formData = new FormData()
-    Object.entries(form).forEach(([k, v]) => formData.append(k, v))
-    formData.append("ticketImage", image)
+    if (!source)      { setError("Please select a starting station."); return }
+    if (!destination) { setError("Please select a destination station."); return }
+    if (source === destination) { setError("Source and destination cannot be the same."); return }
+    if (!image)       { setError("Please upload a ticket image."); return }
 
     try {
       setLoading(true)
-      await submitTicket(formData)
+      await submitTicket(source, destination)
       setSuccess(true)
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.")
@@ -55,7 +72,7 @@ export default function Form() {
   }
 
   const reset = () => {
-    setForm({ name: "", email: "", transportType: "" })
+    setSource(""); setDestination(""); setTransportType("")
     setImage(null); setPreview(null); setSuccess(false); setError("")
   }
 
@@ -86,6 +103,8 @@ export default function Form() {
             outline: none;
             transition: border-color 0.2s, background 0.2s;
             box-sizing: border-box;
+            appearance: none;
+            -webkit-appearance: none;
           }
           .field-input::placeholder { color: rgba(255,255,255,0.2); }
           .field-input:focus {
@@ -102,6 +121,18 @@ export default function Form() {
             letter-spacing: 0.08em;
             text-transform: uppercase;
             margin-bottom: 8px;
+          }
+
+          .select-wrap { position: relative; }
+          .select-wrap::after {
+            content: '▾';
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255,255,255,0.3);
+            pointer-events: none;
+            font-size: 12px;
           }
 
           .drop-zone {
@@ -162,7 +193,7 @@ export default function Form() {
             <ArrowLeft size={15} /> Back
           </button>
 
-          {/* Success state */}
+          {/* Success */}
           {success ? (
             <div className="glass p-10 text-center fade-in">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
@@ -170,7 +201,9 @@ export default function Form() {
                 <CheckCircle size={28} style={{ color: '#17ce3c' }} />
               </div>
               <h2 className="text-2xl font-extrabold text-white mb-2">Ticket Submitted!</h2>
-              <p className="text-white/40 text-sm mb-8">Your ticket has been received successfully. You'll earn credits for using public transport.</p>
+              <p className="text-white/40 text-sm mb-8">
+                Your trip from <span className="text-white font-semibold">{source}</span> to <span className="text-white font-semibold">{destination}</span> has been recorded. Credits have been added to your account!
+              </p>
               <button onClick={reset} className="submit-btn" style={{ maxWidth: 200, margin: '0 auto' }}>
                 Submit Another
               </button>
@@ -181,42 +214,61 @@ export default function Form() {
               <div className="mb-8 fade-in">
                 <p className="text-xs font-mono text-white/25 tracking-[3px] uppercase mb-2">◈ Public Transport Portal</p>
                 <h1 className="text-3xl font-extrabold text-white">Upload Your Ticket</h1>
-                <p className="text-white/35 text-sm mt-2">Submit your public transport ticket to earn eco credits.</p>
+                <p className="text-white/35 text-sm mt-2">Submit your metro ticket to earn eco credits.</p>
               </div>
 
               {/* Form card */}
               <div className="glass p-8 fade-in space-y-5">
 
-                {/* Starting point */}
+                {/* Source station */}
                 <div>
-                  <label className="field-label">Starting Point</label>
-                  <input
-                    name="name" required value={form.name} onChange={handleChange}
-                    placeholder="e.g. Shivajinagar"
-                    className="field-input"
-                  />
+                  <label className="field-label">Starting Station</label>
+                  <div className="select-wrap">
+                    <select
+                      value={source}
+                      onChange={e => setSource(e.target.value)}
+                      className="field-input"
+                      required
+                    >
+                      <option value="">Select station</option>
+                      {STATIONS.map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
-                {/* Destination */}
+                {/* Destination station */}
                 <div>
-                  <label className="field-label">Destination</label>
-                  <input
-                    name="email" required value={form.email} onChange={handleChange}
-                    placeholder="e.g. Pune Station"
-                    className="field-input"
-                  />
+                  <label className="field-label">Destination Station</label>
+                  <div className="select-wrap">
+                    <select
+                      value={destination}
+                      onChange={e => setDestination(e.target.value)}
+                      className="field-input"
+                      required
+                    >
+                      <option value="">Select station</option>
+                      {STATIONS.filter(s => s !== source).map(s => (
+                        <option key={s} value={s}>{s}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 {/* Transport type */}
                 <div>
                   <label className="field-label">Transport Type</label>
-                  <select
-                    name="transportType" required value={form.transportType} onChange={handleChange}
-                    className="field-input"
-                  >
-                    <option value="">Select type</option>
-                    {TRANSPORT_TYPES.map((t) => <option key={t}>{t}</option>)}
-                  </select>
+                  <div className="select-wrap">
+                    <select
+                      value={transportType}
+                      onChange={e => setTransportType(e.target.value)}
+                      className="field-input"
+                    >
+                      <option value="">Select type</option>
+                      {TRANSPORT_TYPES.map(t => <option key={t}>{t}</option>)}
+                    </select>
+                  </div>
                 </div>
 
                 {/* Image upload */}
@@ -250,7 +302,7 @@ export default function Form() {
                       className="drop-zone"
                       onClick={() => fileRef.current.click()}
                       onDrop={handleDrop}
-                      onDragOver={(e) => e.preventDefault()}
+                      onDragOver={e => e.preventDefault()}
                     >
                       <Upload size={22} />
                       <p className="text-sm font-semibold">Click or drag & drop</p>

@@ -83,11 +83,11 @@ import { useEffect, useState } from "react"
         <div className="syne min-h-screen" style={{ background: "#080c09" }}>
           <Navbar />
 
-          <div className="max-w-3xl mx-auto px-4 pb-20 pt-10">
+          <div className="max-w-3xl mx-auto px-4 pb-20 pt-32 ">
 
             {/* Page title */}
             <div className="text-center mb-12 fade-up">
-              <div className="mono text-[10px] text-[#17ce3c] tracking-[4px] uppercase mb-3">◈ Season Rankings</div>
+              <div className="mono text-[10px] text-[#17ce3c] tracking-[4px] uppercase mb-3">◈ Weekly Rankings</div>
               <h1 className="text-5xl font-extrabold text-white tracking-tight leading-none">
                 Leader<span style={{ color: "#17ce3c" }}>board</span>
               </h1>

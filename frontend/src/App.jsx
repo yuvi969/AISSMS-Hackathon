@@ -11,10 +11,12 @@ import Signup from "./Pages/Signup"
 import Form from "./Pages/Form"
 import Noise from "./Pages/Noise";
 import Forest from "./Pages/ForestCover";
+import ParticleBackground from './Components/ParticleBackground';
 
 const App = () => {
   return (
     <>
+    <ParticleBackground />
     <Routes>
       <Route path="/" element={<Homepage />} />
       <Route path="/dashboard" element={<Dashboard />} />

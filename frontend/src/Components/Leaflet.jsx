@@ -267,9 +267,7 @@ export default function DynamicLeafletMap() {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="mono-font text-[10px] text-green-600 tracking-[3px] uppercase mb-2">
-            ◈ Live Data from OpenWeather API
-          </div>
+         
           <h2 className="text-4xl font-extrabold text-slate-800 tracking-tight">
             Air Quality Intelligence
           </h2>

@@ -74,30 +74,24 @@ export const logoutUser = () => {
 }
 
 // ─── TICKETS ──────────────────────────────────────────
-export const submitTicket = async (formData) => {
-  const response = await fetch($`{URL}/tickets/submit`, {
-    method: "POST",
-    body: formData,
+export const submitTicket = async (source, destination) => {
+  const response = await fetch(`${URL}/submit_ticket`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...getAuthHeaders(),
+    },
+    body: JSON.stringify({ source, destination }),
   })
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || "Failed to submit ticket")
-  }
-
-  return response.json()
+  return handleResponse(response)
 }
+
+// ─── LEADERBOARD ──────────────────────────────────────
 export const fetchLeaderboard = async () => {
-  const response = await fetch($`{URL}/users/leaderboard`)
-
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(error.message || "Failed to fetch leaderboard")
-  }
-
-  return response.json()
+  const response = await fetch(`${URL}/leaderboard`, {
+    headers: { ...getAuthHeaders() },
+  })
+  return handleResponse(response)
 }
-
-
 
 export { getAQI, getAQIForMultipleCities }
