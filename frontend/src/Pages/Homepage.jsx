@@ -2,16 +2,47 @@ import { useEffect, useRef } from "react"
 import Navbar from "../Components/Navbar"
 import Leaflet from "../Components/Leaflet"
 import EnvIcon from "../Components/Evicon"
+import { useLang } from "../Components/Languagecontext"
 
-// const stats = [
-//   { value: "2.4M", label: "Active Users",     icon: "◈", color: "#1C7DF1" },
-//   { value: "847",  label: "Cities Monitored", icon: "⬡", color: "#17ce3c" },
-//   { value: "12K",  label: "Rewards Earned",   icon: "◆", color: "#ed8a26" },
-//   { value: "98%",  label: "Data Accuracy",    icon: "▲", color: "#a855f7" },
-// ]
+const homeT = {
+  EN: {
+    badge:  "Real-time Environmental Intelligence",
+    title1: "Monitor the Planet.",
+    title2: "Earn for Every Action.",
+    sub:    "EcoSimple turns environmental data into actionable insights — track air quality, earn green rewards, and make sustainability second nature.",
+    cta1:   "🌿 Explore Dashboard",
+    cta2:   "🏆 Leaderboard",
+  },
+  HI: {
+    badge:  "रियल-टाइम पर्यावरण इंटेलिजेंस",
+    title1: "ग्रह की निगरानी करें।",
+    title2: "हर कार्य के लिए कमाएं।",
+    sub:    "EcoSimple पर्यावरण डेटा को कार्रवाई योग्य अंतर्दृष्टि में बदलता है — वायु गुणवत्ता ट्रैक करें, हरित पुरस्कार अर्जित करें।",
+    cta1:   "🌿 डैशबोर्ड देखें",
+    cta2:   "🏆 लीडरबोर्ड",
+  },
+  MR: {
+    badge:  "रिअल-टाइम पर्यावरण बुद्धिमत्ता",
+    title1: "ग्रहाचे निरीक्षण करा.",
+    title2: "प्रत्येक कृतीसाठी कमवा.",
+    sub:    "EcoSimple पर्यावरण डेटाचे कृतीयोग्य अंतर्दृष्टीत रूपांतर करते — हवा गुणवत्ता ट्रॅक करा, हरित पुरस्कार मिळवा.",
+    cta1:   "🌿 डॅशबोर्ड एक्सप्लोर करा",
+    cta2:   "🏆 लीडरबोर्ड",
+  },
+  TA: {
+    badge:  "நிகழ்நேர சுற்றுச்சூழல் நுண்ணறிவு",
+    title1: "கோளை கண்காணியுங்கள்.",
+    title2: "ஒவ்வொரு செயலுக்கும் சம்பாதியுங்கள்.",
+    sub:    "EcoSimple சுற்றுச்சூழல் தரவை செயல்படத்தக்க நுண்ணறிவாக மாற்றுகிறது — காற்றின் தரத்தை கண்காணிக்கவும், பசுமை வெகுமதிகளை பெறவும்.",
+    cta1:   "🌿 டாஷ்போர்டை ஆராயுங்கள்",
+    cta2:   "🏆 லீடர்போர்டு",
+  },
+}
 
 export default function Homepage() {
   const canvasRef = useRef(null)
+  const { lang } = useLang()
+  const t = homeT[lang] || homeT.EN
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -72,7 +103,7 @@ export default function Homepage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap');
 
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(28px); }
@@ -92,42 +123,34 @@ export default function Homepage() {
           justify-content: center;
           padding: 120px 24px 80px;
           overflow: hidden;
-          font-family: 'Syne', sans-serif;
+          font-family: 'DM Sans', sans-serif;
           background:
-            radial-gradient(ellipse 80% 60% at 50% 0%, rgba(23,206,60,0.08) 0%, transparent 70%),
-            radial-gradient(ellipse 60% 40% at 80% 80%, rgba(28,125,241,0.06) 0%, transparent 60%),
-            #050a06;
+            radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,102,241,0.07) 0%, transparent 70%),
+            radial-gradient(ellipse 60% 40% at 80% 80%, rgba(23,206,60,0.05) 0%, transparent 60%),
+            #0d0f14;
         }
 
-        .hero-canvas {
-          position: absolute; inset: 0;
-          width: 100%; height: 100%;
-          pointer-events: none;
-        }
+        .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
         .hero-grid {
-          position: absolute; inset: 0;
+          position: absolute; inset: 0; pointer-events: none;
           background-image:
-            linear-gradient(rgba(23,206,60,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(23,206,60,0.04) 1px, transparent 1px);
+            linear-gradient(rgba(99,102,241,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99,102,241,0.04) 1px, transparent 1px);
           background-size: 60px 60px;
           mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
-          pointer-events: none;
         }
 
-        .hero-content {
-          position: relative; z-index: 2;
-          text-align: center; max-width: 760px;
-        }
+        .hero-content { position: relative; z-index: 2; text-align: center; max-width: 760px; }
 
         .hero-badge {
           display: inline-flex; align-items: center; gap: 8px;
-          padding: 6px 16px;
-          background: rgba(23,206,60,0.1);
-          border: 1px solid rgba(23,206,60,0.25);
+          padding: 6px 18px;
+          background: rgba(99,102,241,0.1);
+          border: 1px solid rgba(99,102,241,0.25);
           border-radius: 100px;
           font-family: 'Space Mono', monospace;
-          font-size: 11px; color: #17ce3c;
+          font-size: 10px; color: #818cf8;
           letter-spacing: 2px; text-transform: uppercase;
           margin-bottom: 28px;
           animation: fadeUp 0.6s ease both;
@@ -140,8 +163,9 @@ export default function Homepage() {
         }
 
         .hero-title {
-          font-size: clamp(42px, 7vw, 80px);
-          font-weight: 800; line-height: 1.05; letter-spacing: -2px;
+          font-family: 'DM Serif Display', serif;
+          font-size: clamp(42px, 7vw, 76px);
+          font-weight: 400; line-height: 1.08; letter-spacing: -1px;
           color: #fff; margin-bottom: 20px;
           animation: fadeUp 0.7s ease 0.1s both;
         }
@@ -153,8 +177,8 @@ export default function Homepage() {
         }
 
         .hero-sub {
-          font-size: 17px; color: rgba(255,255,255,0.45);
-          max-width: 500px; margin: 0 auto 40px; line-height: 1.7;
+          font-size: 17px; color: rgba(255,255,255,0.4);
+          max-width: 500px; margin: 0 auto 40px; line-height: 1.75;
           animation: fadeUp 0.7s ease 0.2s both;
         }
 
@@ -167,51 +191,24 @@ export default function Homepage() {
           padding: 13px 28px;
           background: linear-gradient(135deg, #17ce3c, #0aad32);
           border: none; border-radius: 14px;
-          color: #050a06; font-family: 'Syne', sans-serif;
+          color: #050a06; font-family: 'DM Sans', sans-serif;
           font-size: 14px; font-weight: 700; cursor: pointer;
           text-decoration: none; display: inline-block;
-          box-shadow: 0 4px 24px rgba(23,206,60,0.35);
+          box-shadow: 0 4px 24px rgba(23,206,60,0.3);
           transition: transform 0.2s, box-shadow 0.2s;
         }
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(23,206,60,0.55); }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(23,206,60,0.5); }
 
         .btn-ghost {
           padding: 13px 28px;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 14px; color: rgba(255,255,255,0.7);
-          font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600;
+          background: rgba(99,102,241,0.08);
+          border: 1px solid rgba(99,102,241,0.25);
+          border-radius: 14px; color: #a5b4fc;
+          font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
           cursor: pointer; text-decoration: none; display: inline-block;
           backdrop-filter: blur(12px); transition: all 0.2s;
         }
-        .btn-ghost:hover { background: rgba(255,255,255,0.1); color: #fff; transform: translateY(-3px); }
-
-        .stats-strip {
-          position: relative; z-index: 2;
-          display: grid; grid-template-columns: repeat(4, 1fr);
-          gap: 1px; max-width: 860px; width: 100%;
-          margin: 60px auto 0;
-          background: rgba(255,255,255,0.06);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 20px; overflow: hidden;
-          animation: fadeUp 0.7s ease 0.4s both;
-        }
-
-        .stat-item {
-          padding: 24px 20px; background: rgba(5,10,6,0.9);
-          text-align: center; transition: background 0.25s;
-        }
-        .stat-item:hover { background: rgba(23,206,60,0.05); }
-        .stat-icon  { font-size: 14px; margin-bottom: 8px; display: block; }
-        .stat-value { font-size: 26px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
-        .stat-label {
-          font-family: 'Space Mono', monospace; font-size: 10px;
-          color: rgba(255,255,255,0.35); letter-spacing: 1px; text-transform: uppercase;
-        }
-
-        @media (max-width: 640px) {
-          .stats-strip { grid-template-columns: repeat(2, 1fr); }
-        }
+        .btn-ghost:hover { background: rgba(99,102,241,0.15); color: #fff; transform: translateY(-3px); }
       `}</style>
 
       <Navbar />
@@ -223,37 +220,26 @@ export default function Homepage() {
         <div className="hero-content">
           <div className="hero-badge">
             <span className="badge-dot" />
-            Real-time Environmental Intelligence
+            {t.badge}
           </div>
 
           <h1 className="hero-title">
-            Monitor the Planet.<br />
-            <span>Earn for Every Action.</span>
+            {t.title1}<br />
+            <span>{t.title2}</span>
           </h1>
 
-          <p className="hero-sub">
-            EcoSimple turns environmental data into actionable insights — track air quality,
-            earn green rewards, and make sustainability second nature.
-          </p>
+          <p className="hero-sub">{t.sub}</p>
 
           <div className="hero-actions">
-            <a href="/dashboard" className="btn-primary">🌿 Explore Dashboard</a>
-            <a href="/leaderboard" className="btn-ghost">🏆 Leaderboard</a>
+            <a href="/dashboard" className="btn-primary">{t.cta1}</a>
+            <a href="/leaderboard" className="btn-ghost">{t.cta2}</a>
           </div>
         </div>
-        <EnvIcon/>
-        {/* <div className="stats-strip">
-          {stats.map((s, i) => (
-            // <div className="stat-item" key={i}>
-            //   <span className="stat-icon" style={{ color: s.color }}>{s.icon}</span>
-            //   <div className="stat-value" style={{ color: s.color }}>{s.value}</div>
-            //   <div className="stat-label">{s.label}</div>
-            // </div>
-          ))}
-        </div> */}
+
+        <EnvIcon />
       </section>
-      {/* <div className=" bg-gradient-to-b from-[#050a06] to-[#f2f6f9]  px-14 py-12 "/> */}
-          <Leaflet/>
+
+      <Leaflet />
     </>
   )
 }

@@ -12,6 +12,7 @@ import Form from "./Pages/Form"
 import Noise from "./Pages/Noise";
 import Forest from "./Pages/ForestCover";
 import ParticleBackground from './Components/ParticleBackground';
+import Notifications from "./Pages/notification";
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
       <Route path="/form"element={<Form />} />
       <Route path="/noise"element={<Noise />} />
       <Route path="/forest"element={<Forest />} />
+      <Route path="/notifications"element={<Notifications />}/>
     </Routes>
     </>
   )
